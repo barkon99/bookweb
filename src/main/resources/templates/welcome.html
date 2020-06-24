@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="slider.css">
+</head>
+<body>
+    Hello <span th:text="${name}"/><br>
+    <span th:text="${role}"/>
+
+    <a th:href="@{/homePage/addingBook}">Add a book</a><br>
+    <a th:href="@{/logout}">Logout</a>
+
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th> Id </th>
+                    <th> Title </th>
+                    <th> Author </th>
+                    <th> Average rate </th>
+                    <th> Your rate </th>
+                    <th> Add/Change rate </th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:each="book : ${books}">
+                    <form th:action="@{/homePage/__${book.getId()}__}" method="post" th:object="${bookRate}" class="mt-5" >
+                        <tr th:with="bookId=${book.id}" >
+                            <td th:text="${bookId}" ></td>
+                            <td th:text="${book.title}">...</td>
+                            <td th:text="${book.author}">...</td>
+                            <div th:if="${book.averageRate} == 0">
+                                <td>Brak ocen</td>
+                            </div>
+                            <div th:if="${book.averageRate} != 0">
+                                <td th:text="${book.averageRate}"></td>
+                            </div>
+
+                            <td>
+                                <div  th:each="addedRatings: ${addedRates}" >
+                                    <div  th:if="${addedRatings.getBookId()} == ${book.id}">
+                                        <p th:text="${addedRatings.getRate()}"></p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="range-wrap">
+                                    <input  type="range" class="range slider"  min="1" max="10"  name="rate" >
+                                    <p>Value: <output class="bubble"></output></p>
+                                </div>
+                            </td>
+
+                            <td><button class="btn btn-primary" type="submit">Save</button></td>
+                        </tr>
+                    </form>
+                </th:block>
+            </tbody>
+        </table>
+    </div>
+    <div th:with="amountOfBook=${#lists.size(books)}"><p th:text="${amountOfBook}"></p></div>
+
+<script>
+
+    const allSliders = document.querySelectorAll(".range-wrap");
+
+    allSliders.forEach(wrap => {
+        const slider = wrap.querySelector(".range");
+        const value = wrap.querySelector(".bubble");
+
+        slider.addEventListener("input", () => {
+            setBubble(slider, value);
+        });
+        setBubble(slider, value);
+    });
+
+    function setBubble(slider, value) {
+        const val = slider.value;
+        value.innerHTML = val;
+    }
+</script>
+
+</body>
+</html>
